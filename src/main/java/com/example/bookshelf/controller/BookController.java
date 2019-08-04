@@ -7,6 +7,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fi.iki.elonen.NanoHTTPD;
 
+import java.util.List;
+import java.util.Map;
+
 import static fi.iki.elonen.NanoHTTPD.Response.Status.INTERNAL_ERROR;
 import static fi.iki.elonen.NanoHTTPD.Response.Status.OK;
 import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
@@ -16,7 +19,7 @@ public class BookController {
     private BookStorage bookStorage = new StaticListBookStorageImpl();
 
     public NanoHTTPD.Response serveGetBookRequest(NanoHTTPD.IHTTPSession session){
-        return  null;
+        Map<String, List<String>> requestParameters = session.getParameters();
     }
 
     public NanoHTTPD.Response serveGetBooksRequest(NanoHTTPD.IHTTPSession session){
