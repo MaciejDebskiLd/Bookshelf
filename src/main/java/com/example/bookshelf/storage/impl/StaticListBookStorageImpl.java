@@ -1,11 +1,12 @@
 package com.example.bookshelf.storage.impl;
 
 import com.example.bookshelf.Book;
+import com.example.bookshelf.storage.BookStorage;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class StaticListBookStorageImpl {
+public class StaticListBookStorageImpl implements BookStorage {
 
     private static List<Book> bookStorage = new ArrayList<Book>();
 
