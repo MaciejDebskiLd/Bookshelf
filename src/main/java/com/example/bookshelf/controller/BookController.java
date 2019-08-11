@@ -10,16 +10,40 @@ import fi.iki.elonen.NanoHTTPD;
 import java.util.List;
 import java.util.Map;
 
-import static fi.iki.elonen.NanoHTTPD.Response.Status.INTERNAL_ERROR;
-import static fi.iki.elonen.NanoHTTPD.Response.Status.OK;
+import static fi.iki.elonen.NanoHTTPD.Response.Status.*;
 import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
 
 public class BookController {
+    private final static String BOOK_ID_PARAM_NAME = "bookId";
 
     private BookStorage bookStorage = new StaticListBookStorageImpl();
 
     public NanoHTTPD.Response serveGetBookRequest(NanoHTTPD.IHTTPSession session){
         Map<String, List<String>> requestParameters = session.getParameters();
+        if (requestParameters.containsKey(BOOK_ID_PARAM_NAME)){
+            List<String> bookIdParams = requestParameters.get(BOOK_ID_PARAM_NAME);
+            String bookIdParam = bookIdParams.get(0);
+            long bookId = 0;
+
+            try {
+                bookId = Long.parseLong(bookIdParam);
+            }catch (NumberFormatException nfe){
+                System.err.println("Error during convert request param: \n" + nfe);
+                return newFixedLengthResponse(BAD_REQUEST, "text/plain", "Request parm 'bookId' has to be a number");
+            }
+
+            Book book = bookStorage.getBook(bookId);
+            if (book != null){
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    String response = objectMapper.writeValueAsString(book);
+                    return newFixedLengthResponse(OK, "application/json", response);
+                }catch (JsonProcessingException e){
+                    System.err.println("Error during process request: \n" + e);
+                    return newFixedLengthResponse(INTERNAL_ERROR, "text/plain", "Internal error cant't read all book");
+                }
+            }return newFixedLengthResponse(NOT_FOUND, "application/json", "");
+        }return newFixedLengthResponse(BAD_REQUEST, "text/plain", "Uncorrect request params");
     }
 
     public NanoHTTPD.Response serveGetBooksRequest(NanoHTTPD.IHTTPSession session){
