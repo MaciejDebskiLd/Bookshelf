@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostgresBookStorageImpl implements BookStorage {
+public class PostgresBookStorageImplTemp implements BookStorage {
 
     private final static String JDBC_URL = "jdbc:postgresql://localhost:5433/book_store";
     private final static String DATABASE_USER = "postgres";
@@ -19,7 +19,7 @@ public class PostgresBookStorageImpl implements BookStorage {
         Connection connection = DriverManager.getConnection(JDBC_URL, DATABASE_USER, DATABASE_PASS);
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, title, author, pagessum, yearofpublished, publishinghouse FROM books WHERE id = ?);");
         Book book = new Book();
-        //book.setId();
+
 
         preparedStatement.close();
         connection.close();
@@ -67,24 +67,17 @@ public class PostgresBookStorageImpl implements BookStorage {
 
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO books (title, author, pagessum, yearofpublished, publishinghouse) VALUES (?, ?, ?, ?, ?) RETURNING id;");
 
-        preparedStatement.setString(1, book.getTitle());
-        preparedStatement.setString(2, book.getAuthor());
-        preparedStatement.setInt(3, book.getPagesSum());
-        preparedStatement.setInt(4, book.getYearOfPublished());
-        preparedStatement.setString(5, book.getPublishingHouse());
-
-        ResultSet resultSet = preparedStatement.executeQuery();
-        long id = 0;
-        while (resultSet.next()) {
-            id = resultSet.getLong("id");
-            return id;
-        }
+        //preparedStatement.setLong(1, book.getId());
+        preparedStatement.setString(2, book.getTitle());
+        preparedStatement.setString(3, book.getAuthor());
+        preparedStatement.setInt(4, book.getPagesSum());
+        preparedStatement.setInt(5, book.getYearOfPublished());
+        preparedStatement.setString(6, book.getPublishingHouse());
 
         preparedStatement.executeUpdate();
 
         preparedStatement.close();
         connection.close();
-
-        return -1;
+        return 0;
     }
 }
