@@ -33,18 +33,26 @@ public class PostgresBookStorageImpl implements BookStorage {
 
         ResultSet resultSet = statement.executeQuery("SELECT * FROM books");
 
+        int i = 0;
         while ((resultSet.next())) {
+            Book book = new Book();
             int id = resultSet.getInt(1);
+            book.setId(id);
             String title = resultSet.getString("title");
+            book.setTitle(title);
             String author = resultSet.getString(3);
+            book.setAuthor(author);
             int pagessum = resultSet.getInt(4);
+            book.setPagesSum(pagessum);
             int yearofpublished = resultSet.getInt(5);
+            book.setYearOfPublished(yearofpublished);
             String publishinghouse = resultSet.getString(6);
-            Book book = new Book(id, title, author, pagessum, yearofpublished, publishinghouse);
-            bookStorage.add(book);
-            return bookStorage;
-        }
+            book.setPublishingHouse(publishinghouse);
 
+            bookStorage.add(book);
+            i++;
+
+        }
 
         statement.close();
         connection.close();
@@ -57,12 +65,12 @@ public class PostgresBookStorageImpl implements BookStorage {
 
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO books (id, title, author, pagessum, yearofpublished, publishinghouse) VALUES (?, ?, ?, ?, ?, ?);");
 
-        preparedStatement.setInt(1, 5);
-        preparedStatement.setString(2, "Gomorra");
-        preparedStatement.setString(3, "Jan Kosa");
-        preparedStatement.setInt(4, 200);
-        preparedStatement.setInt(5, 1999);
-        preparedStatement.setString(6, "Oko");
+        preparedStatement.setLong(1, book.getId());
+        preparedStatement.setString(2, book.getTitle());
+        preparedStatement.setString(3, book.getAuthor());
+        preparedStatement.setInt(4, book.getPagesSum());
+        preparedStatement.setInt(5, book.getYearOfPublished());
+        preparedStatement.setString(6, book.getPublishingHouse());
 
         preparedStatement.executeUpdate();
 
