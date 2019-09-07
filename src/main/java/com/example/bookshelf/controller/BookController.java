@@ -2,11 +2,13 @@ package com.example.bookshelf.controller;
 
 import com.example.bookshelf.Book;
 import com.example.bookshelf.storage.BookStorage;
+import com.example.bookshelf.storage.impl.PostgresBookStorageImpl;
 import com.example.bookshelf.storage.impl.StaticListBookStorageImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fi.iki.elonen.NanoHTTPD;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -16,9 +18,10 @@ import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
 public class BookController {
     private final static String BOOK_ID_PARAM_NAME = "bookId";
 
-    private BookStorage bookStorage = new StaticListBookStorageImpl();
+//    private BookStorage bookStorage = new StaticListBookStorageImpl();
+    private BookStorage bookStorage = new PostgresBookStorageImpl();
 
-    public NanoHTTPD.Response serveGetBookRequest(NanoHTTPD.IHTTPSession session){
+    public NanoHTTPD.Response serveGetBookRequest(NanoHTTPD.IHTTPSession session) throws SQLException, ClassNotFoundException {
         Map<String, List<String>> requestParameters = session.getParameters();
         if (requestParameters.containsKey(BOOK_ID_PARAM_NAME)){
             List<String> bookIdParams = requestParameters.get(BOOK_ID_PARAM_NAME);
@@ -46,7 +49,7 @@ public class BookController {
         }return newFixedLengthResponse(BAD_REQUEST, "text/plain", "Uncorrect request params");
     }
 
-    public NanoHTTPD.Response serveGetBooksRequest(NanoHTTPD.IHTTPSession session){
+    public NanoHTTPD.Response serveGetBooksRequest(NanoHTTPD.IHTTPSession session) throws SQLException, ClassNotFoundException {
         ObjectMapper objectMapper = new ObjectMapper();
         String response = "";
 

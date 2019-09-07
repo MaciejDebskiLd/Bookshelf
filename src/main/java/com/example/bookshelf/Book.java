@@ -9,6 +9,18 @@ public class Book {
     private Integer yearOfPublished;
     private String publishingHouse;
 
+    public Book(long id, String title, String author, Integer pagesSum, Integer yearOfPublished, String publishingHouse) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.pagesSum = pagesSum;
+        this.yearOfPublished = yearOfPublished;
+        this.publishingHouse = publishingHouse;
+    }
+    public Book(){
+
+    }
+
     public long getId() {
         return id;
     }
