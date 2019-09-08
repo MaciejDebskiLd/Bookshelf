@@ -17,10 +17,25 @@ public class PostgresBookStorageImpl implements BookStorage {
     public Book getBook(long id) throws SQLException, ClassNotFoundException {
         Class.forName("org.postgresql.Driver");
         Connection connection = DriverManager.getConnection(JDBC_URL, DATABASE_USER, DATABASE_PASS);
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, title, author, pagessum, yearofpublished, publishinghouse FROM books WHERE id = ?);");
-        Book book = new Book();
-        //book.setId();
 
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, title, author, pagessum, yearofpublished, publishinghouse FROM books WHERE id = ?;)");
+
+        preparedStatement.setLong(1, id);
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        Book book = new Book();
+
+        if (resultSet.next()) {
+            book.setId(id);
+            book.setTitle(resultSet.getString("title"));
+            book.setAuthor(resultSet.getString("author"));
+            book.setPagesSum(resultSet.getInt("pages_sum"));
+            book.setYearOfPublished(resultSet.getInt("year_of_published"));
+            book.setPublishingHouse(resultSet.getString("publishing_house"));
+
+            return book;
+        }
         preparedStatement.close();
         connection.close();
         return null;
@@ -55,17 +70,15 @@ public class PostgresBookStorageImpl implements BookStorage {
             i++;
 
         }
-
         statement.close();
         connection.close();
         return bookStorage;
     }
-
     @Override
     public long addBook(Book book) throws SQLException {
         Connection connection = DriverManager.getConnection(JDBC_URL, DATABASE_USER, DATABASE_PASS);
 
-        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO books (title, author, pagessum, yearofpublished, publishinghouse) VALUES (?, ?, ?, ?, ?) RETURNING id;");
+        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO books (id, title, author, pagessum, yearofpublished, publishinghouse) VALUES (nextval('sekwencja'),?, ?, ?, ?, ?) RETURNING id;");
 
         preparedStatement.setString(1, book.getTitle());
         preparedStatement.setString(2, book.getAuthor());
@@ -73,14 +86,17 @@ public class PostgresBookStorageImpl implements BookStorage {
         preparedStatement.setInt(4, book.getYearOfPublished());
         preparedStatement.setString(5, book.getPublishingHouse());
 
-        ResultSet resultSet = preparedStatement.executeQuery();
+
+        preparedStatement.execute();
+        ResultSet resultSet = preparedStatement.getResultSet();
         long id = 0;
         while (resultSet.next()) {
-            id = resultSet.getLong("id");
-            return id;
+            id = resultSet.getLong(1);
+
         }
 
-        preparedStatement.executeUpdate();
+//        preparedStatement.executeUpdate();
+
 
         preparedStatement.close();
         connection.close();
